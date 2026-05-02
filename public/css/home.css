@@ -1,0 +1,273 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  background-color: white;
+}
+
+
+.head{
+  display: flex;
+  height: 50px;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.logo h3{
+  color: #25b166;
+  margin-top: 5px;
+  padding: 7px;
+  font-size: 2rem;
+}
+
+
+.options{
+  display: flex;
+  align-items: center;
+}
+
+.options i{
+  font-size: 1.4rem;
+}
+
+.settings i{
+  font-size: 1.7rem;
+  color: #454545;
+}
+
+.options div{
+  margin-right: 0.5rem;
+  
+}
+
+.srch{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0.3rem 0;
+}
+.srch input{
+  width: 90%;
+  height: 40px;
+  background-color: #eee;
+  border-radius: 1.5rem;
+  border: none;
+  padding: 0.5rem;
+}
+
+.new-contact{
+  position: absolute;
+  height: 50px;
+  width: 50px;
+  padding: 0.4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #25b166;
+  border-radius: 100%;
+  border: none;
+  font-size: 1.7rem;
+  color: white;
+  bottom: 30px;
+  right: 30px;
+}
+
+main{
+  padding: 10px 20px;
+}
+
+a{
+  color: black;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.chat{
+  display: flex;
+  height: 50px;
+  align-items: center;
+}
+
+.chat div{
+  margin-right: 15px;
+}
+
+.dp{
+  height: 90%;
+  width: 45px;
+}
+
+.dp img{
+  height: 100%;
+  width: 100%;
+  border-radius: 100%;
+}
+
+.ellipsis{
+  position: relative;
+  border-radius: 100%;
+  padding: 5px
+}
+
+.active{
+  background-color: #efefef;
+}
+
+.actions{
+  width: 150px;
+  box-shadow: 2px 2px 10px #ababab;
+  height: 115px;
+  position: absolute;
+  top: 40px;
+  right: 0;
+  z-index: 999;
+  background-color: #fff;
+
+  /* animation setup */
+  opacity: 0;
+  transform: scale(0.9);
+  transform-origin: top right;
+  pointer-events: none;
+
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.block{
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+.actions div{
+  padding: 2px;
+  padding-left: 5px;
+  height: 35px;
+  padding-top: 5px;
+  background-color: white;
+  width: 100%;
+}
+
+.actions div:hover{
+  background-color: #efefef;
+}
+
+/* ========================= */
+/* Small phones (≤ 480px) */
+/* ========================= */
+@media (max-width: 480px){
+
+  .logo h3{
+    font-size: 1.5rem;
+  }
+
+  .options i{
+    font-size: 1.2rem;
+  }
+
+  .settings i{
+    font-size: 1.4rem;
+  }
+
+  .srch input{
+    width: 95%;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+
+  .chat{
+    height: 45px;
+  }
+
+  .dp{
+    width: 40px;
+  }
+
+  .new-contact{
+    height: 45px;
+    width: 45px;
+    font-size: 1.5rem;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  main{
+    padding: 8px 12px;
+  }
+}
+
+
+/* ========================= */
+/* Tablets (481px – 768px) */
+/* ========================= */
+@media (min-width: 481px) and (max-width: 768px){
+
+  .logo h3{
+    font-size: 1.8rem;
+  }
+
+  .srch input{
+    width: 85%;
+  }
+
+  .chat{
+    height: 55px;
+  }
+
+  .dp{
+    width: 50px;
+  }
+
+  .new-contact{
+    height: 50px;
+    width: 50px;
+  }
+
+  main{
+    padding: 12px 18px;
+  }
+}
+
+
+/* ========================= */
+/* Small laptops (769px – 1024px) */
+/* ========================= */
+@media (min-width: 769px) and (max-width: 1024px){
+
+  .main{
+    max-width: 700px;
+    margin: auto;
+  }
+
+  .srch input{
+    width: 80%;
+  }
+
+  main{
+    padding: 15px 25px;
+  }
+}
+
+
+/* ========================= */
+/* Large screens (>1024px) */
+/* ========================= */
+@media (min-width: 1025px){
+
+  .main{
+    max-width: 600px;
+    margin: auto;
+    border: 1px solid #ddd;
+  }
+
+  .srch input{
+    width: 75%;
+  }
+
+  main{
+    padding: 20px 30px;
+  }
+
+}

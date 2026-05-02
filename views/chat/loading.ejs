@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loading...</title>
+  <link rel="stylesheet" href="/css/loading.css">
+</head>
+
+<body>
+
+  <img src="/images/pigeon_logo.png">
+
+  <div class="text">
+    Loading chats...
+  </div>
+
+  <script>
+     
+        fetch("/pigeon/data")
+      .then(res => res.text())
+      .then(html => {
+        document.open();
+        document.write(html);
+        document.close();
+      });
+  </script>
+
+</body>
+</html>

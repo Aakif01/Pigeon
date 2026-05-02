@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Register</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/register.css">
+</head>
+<body>
+  <div class="register-form">
+    <h2>Sign Up</h2>
+    <form method="POST" action="/pigeon/register" novalidate class="needs-validation">
+      
+      
+    <label class="form-label" for="phone">Phone No:</label>
+    <input type="text" name="phone" id="phone" inputmode="numeric" pattern="[0-9]{10}" class="form-control" required>
+     <div class="valid-feedback">
+            Looks good!
+          </div>
+         <div class="invalid-feedback">
+           Enter Valid Phone Number
+         </div>
+         <br>
+         
+         
+    <label for="password" class="form-label">Password:</label>
+    <input 
+  type="password"
+  name="password"
+  minlength="8"
+  pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*/])[A-Za-z\d!@#$%^&*/]{8,}$"
+  title="Password must be at least 8 characters long and include one uppercase letter, one number, and one special character (!@#$%^&*/)"
+  id="password"
+  class="form-control"
+  required>
+   <div class="valid-feedback">
+            Looks good!
+          </div>
+         <div class="invalid-feedback">
+           password must be 8 characters long and contains a special character
+         </div>
+         <div class="signup-redirect">Already have an account? <a href="/pigeon/login">login</a></div>
+         
+    <button tyoe="submit" class="submit-btn">Submit</button>
+    </form>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  
+  <script>
+(() => {
+  'use strict'
+
+  const forms = document.querySelectorAll('.needs-validation')
+
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+
+    }, false)
+  })
+})()
+</script>
+</body>
+</html>

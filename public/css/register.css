@@ -1,0 +1,53 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  background-color: white;
+}
+
+.register-form{
+  display: flex;
+  flex-direction: column;
+  margin-top: 70px;
+}
+
+h2{
+  text-align: center;
+  color: #25b166;
+  font-weight: 500;
+}
+
+.register-form form{
+  width: 80%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  margin-top: 40px;
+  position: static;
+}
+
+.submit-btn{
+  background-color: #25b166;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.05rem;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  top: 90px;
+}
+
+.signup-redirect{
+  text-align: right;
+  margin-top: 10px;
+}
+
+.signup-redirect a{
+  text-decoration: none;
+}

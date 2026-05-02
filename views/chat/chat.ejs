@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Pigeon</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=send" />
+ <link rel="stylesheet" href="/css/chat.css">
+</head>
+<body>
+  <header>
+    <div class="head">
+      
+      <a href="/pigeon"><i class="fa-solid fa-arrow-left"></i></a>
+      <div class="dp">
+        <img src="/images/profile.png">
+      </div>
+      <div class="name">+917339259676</div>
+    </div>
+  </header>
+  <main>
+    <div class="chat">
+      <% for(message of messages){ %>
+      <% if(user._id.toString() == message.sender.toString()){ %>
+      <div class="message"><%=message.message%><span 
+          class="time"
+          data-time="<%= message.createdAt %>">
+        </span></div>
+      <% } else{ %>
+      <div class="message receiver"><%=message.message%><span 
+          class="time"
+          data-time="<%= message.createdAt %>">
+        </span></div>
+      <% } %>
+      <% } %>
+    </div>
+    <div class="input">
+      <input type="text" name="message" placeholder="Message" class="user-input">
+      <button class="send-btn"><span class="material-symbols-outlined">send</span></button>
+    </div>
+  </main>
+  <script>
+    const sender = "<%= user._id %>"
+    const conversation = "<%=convoId%>"
+  </script>
+  <script type="module" src="/js/chat.js"></script>
+</body>
+</html>
