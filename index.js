@@ -6,17 +6,41 @@ const http = require("http");
 const webSocket = require("ws");
 const path = require("path");
 const session = require("express-session");
+const ejsMate = require("ejs-mate");
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
+const flash = require("connect-flash");
+const MongoStore = require('connect-mongo').default;
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
+const ExpressError = require("./utils/ExpressError.js");
+const wrapAsync = require("./utils/wrapAsync.js");
 const User = require("./models/users/user.js")
 const Conversation = require("./models/chat/conversation.js");
 const Message = require("./models/chat/message.js");
+const multer = require("multer");
+const { storage } = require("./cloudConfig");
+
+const upload = multer({ storage });
 
 const server = http.createServer(app);
 
+let dbUrl = process.env.ATLASDB_URL;
+
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: process.env.SECRET_KEY
+  },
+  touchAfter: 24*3600
+});
+
+store.on("error", () => {
+  console.log("ERROR in MONGO SESSION STORE", error)
+})
+
 const sessionVariables = {
+  store: store,
   secret: process.env.SECRET_KEY,
   resave: false,
   saveUninitialized: true
@@ -24,14 +48,17 @@ const sessionVariables = {
 
 const sessionParser = session(sessionVariables);
 
+
 main()
 .then( () => console.log("Connected to backend"))
 .catch( (err) => console.log(err) );
 
 async function main(){
-  await mongoose.connect('mongodb://127.0.0.1:27017/pigeon2');
+  await mongoose.connect(dbUrl, {dbName: "pigeon"});
+  console.log("Connected DB:", mongoose.connection.name);
 }
 
+app.engine("ejs", ejsMate);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
@@ -39,14 +66,18 @@ app.use(cookieParser());
 app.use(sessionParser);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.set("includes", path.join(__dirname, "includes"));
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 passport.use(new LocalStrategy({ usernameField: "phone" }, User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+
 
 function isLoggedIn(req, res, next){
   if(!req.user) {
@@ -66,6 +97,7 @@ async function isMember(req, res, next) {
     });
 
     if (!conversation) {
+      req.flash("error", "permission denied")
       return res.redirect("/pigeon");
     }
 
@@ -82,18 +114,26 @@ async function isMember(req, res, next) {
 const users = {};
 
 app.use( async(req, res, next) => {
+  if(req.path !== "/pigeon"){
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  }
   res.locals.user = req.user;
   
   next();
+})
+
+app.get("/", (req, res) => {
+  res.redirect("/pigeon");
 })
 
 app.get("/pigeon", isLoggedIn, (req, res) => {
   res.status(200).render("chat/loading.ejs")
 })
 
-app.get("/pigeon/data", isLoggedIn, async(req, res) => {
+app.get("/pigeon/data", isLoggedIn, wrapAsync(async(req, res) => {
   let userId = req.user._id;
-  let user = await User.findById(userId).populate("friends.convoId");
+  let user = await User.findById(userId).populate("friends.user").populate("friends.convoId");
   
   user.friends.sort((a, b) => {
 
@@ -105,13 +145,13 @@ app.get("/pigeon/data", isLoggedIn, async(req, res) => {
 });
   
   res.render("chat/home.ejs", { user })
-})
+}));
 
 app.get("/pigeon/register", (req, res) => {
   res.status(200).render("user/register.ejs")
 })
 
-app.post("/pigeon/register", async(req, res) => {
+app.post("/pigeon/register", wrapAsync(async(req, res) => {
   try{
     
   let {phone, password} = req.body;
@@ -127,14 +167,68 @@ app.post("/pigeon/register", async(req, res) => {
 
       if (err) return next(err);
 
-      res.redirect("/pigeon"); 
+      res.redirect("/pigeon/user"); 
 
     });
   } catch(err){
     console.log(err);
+    req.flash("error", err.message)
     res.redirect("/pigeon/register");
   }
-})
+}));
+
+app.get("/pigeon/user", isLoggedIn, (req, res) => {
+  res.render("user/user.ejs");
+});
+
+app.post(
+  "/pigeon/user/update",
+  isLoggedIn,
+  upload.single("dp"),
+  wrapAsync(async (req, res) => {
+
+    try {
+
+      let userId = req.user._id;
+
+      let updateData = {};
+
+      if (req.body.username && req.body.username.trim() !== "") {
+
+        updateData.username =
+          req.body.username.trim();
+
+      }
+
+      if (req.file) {
+
+        updateData.profile = {
+          url: req.file.path,
+          filename: req.file.filename
+        };
+
+      }
+
+      if (Object.keys(updateData).length > 0) {
+
+        await User.findByIdAndUpdate(
+          userId,
+          updateData
+        );
+
+      }
+
+      res.redirect("/pigeon/");
+
+    } catch (err) {
+
+      req.flash("error", err.message)
+      res.redirect("/pigeon/user");
+
+    }
+
+  }
+));
 
 app.get("/pigeon/login", (req, res) => {
   res.status(200).render("user/login.ejs")
@@ -144,7 +238,8 @@ app.post(
   "/pigeon/login",
   passport.authenticate("local", {
     successRedirect: "/pigeon",
-    failureRedirect: "/pigeon/login"
+    failureRedirect: "/pigeon/login",
+    failureFlash: true
   })
 );
 
@@ -153,7 +248,7 @@ app.get("/pigeon/logout", (req, res) => {
     if(err){
       next(err);
     }
-    
+    req.flash("success", "You are logged out!")
     res.redirect("/pigeon/login")
   });
 })
@@ -162,7 +257,7 @@ app.get("/pigeon/new", (req, res) => {
   res.status(200).render("user/friend.ejs")
 });
 
-app.post("/pigeon/new", async(req, res) => {
+app.post("/pigeon/new", wrapAsync(async(req, res) => {
   let {phone, firstName, lastName} = req.body;
   
   if(!firstName){
@@ -175,12 +270,13 @@ app.post("/pigeon/new", async(req, res) => {
   }
   
   if(!phone){
+    req.flash("error", "Phone Number is required");
     return res.status(400).redirect("/pigeon/new")
   }
   
   let friend = await User.findOne({ phone }).populate("friends.user");
   if(!friend){
-    console.log("not found")
+    req.flash("error", "user not found. Invite them on pigeon")
     return res.status(404).redirect("/pigeon");
   }
   
@@ -209,9 +305,9 @@ app.post("/pigeon/new", async(req, res) => {
 );
 
 res.status(201).redirect("/pigeon");
-})
+}));
 
-app.get("/pigeon/chat/:convoId",  isLoggedIn, isMember, async(req, res) => {
+app.get("/pigeon/chat/:convoId",  isLoggedIn, isMember, wrapAsync(async(req, res) => {
   let {convoId} = req.params
   let conversation = req.conversation;
   let messages = await Message.find({ conversation: convoId });
@@ -222,8 +318,12 @@ app.get("/pigeon/chat/:convoId",  isLoggedIn, isMember, async(req, res) => {
 
   let friend = await User.findById(friendId);
   
-  res.render("chat/chat.ejs", {friend, messages, convoId})
-})
+  let friendInfo = req.user.friends.find( f => f.user.toString() == friendId.toString());
+  
+  let name = friendInfo.firstName + " " + friendInfo.lastName || " ";
+  
+  res.render("chat/chat.ejs", {friend, messages, convoId, name})
+}))
 
 const wss = new webSocket.Server({ server });
 
@@ -239,10 +339,15 @@ wss.on("connection", (ws, req) => {
     
     let phone = req.session.passport.user;
     
-    
 
       
       let user = await User.findOne({ phone });
+      users[user._id.toString()] = ws;
+      if(users[user._id.toString()]){
+        console.log("New user joined");
+      } else{
+        console.log("error in storing user")
+      }
       
       ws.on("close", () => {
 
@@ -255,13 +360,6 @@ wss.on("connection", (ws, req) => {
     ws.on("message", async (msg) => {
     let data = JSON.parse(msg.toString());
     
-    if(data.type === "join"){
-      console.log("New user joined")
-      users[user._id.toString()] = ws;
-    }
-    
-    console.log("Users list:");
-console.log(Object.keys(users));
     
     if(data.type == "message"){
       let convoId = data.conversation;
@@ -271,7 +369,7 @@ console.log(Object.keys(users));
         console.log("Conversation not found");
         return;
       }
-      
+       
       let friendId = conversation.members.find( m => m.toString() != user._id.toString());
 
       let friend = await User.findById(friendId);
@@ -318,8 +416,6 @@ console.log(Object.keys(users));
        }))
       }
       }
-      console.log(friendId);
-      console.log(users[friendId.toString()]);
       if(users[friendId.toString()]){
         console.log("Friend found")
         users[friendId.toString()].send(JSON.stringify({
@@ -343,8 +439,18 @@ console.log(Object.keys(users));
   });
   
   });
-
-
-server.listen(3000, () => {
-  console.log("Server listening to port 3000")
+  
+  app.all(/.*/, (req, res, next)=>{
+  next(new ExpressError(404, "Page not found"));
+});
+  
+  app.use( (err, req, res, next) => {
+  let {statusCode=500, message="Something went wrong"} = err
+  res.status(statusCode).render("error.ejs", {statusCode, message})
 })
+  
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

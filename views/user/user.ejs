@@ -1,0 +1,55 @@
+<% layout("layouts/boiler") %>
+
+<% style = `
+<link rel="stylesheet" href="/css/user.css">
+` %>
+
+<header>
+  <div class="head">
+    <h3>Profile</h3>
+  </div>
+</header>
+
+<div class="main">
+
+<form 
+  method="POST"
+  action="/pigeon/user/update"
+  enctype="multipart/form-data"
+>
+
+  <!-- Profile Image -->
+  <label for="fileInput" class="profile">
+
+    <img
+      id="preview"
+      src="<%= user.profile?.url || '/images/profile.png' %>"
+    >
+
+  </label>
+
+  <!-- Hidden File Input -->
+  <input
+    type="file"
+    name="dp"
+    id="fileInput"
+    accept="image/*"
+    hidden
+  >
+
+  <!-- Username -->
+  <input
+    type="text"
+    name="username"
+    value="<%= user.username || user.phone %>"
+    placeholder="Enter username"
+  >
+
+  <button type="submit">
+    Save
+  </button>
+
+</form>
+</div>
+
+<script src="/js/profile.js"></script>

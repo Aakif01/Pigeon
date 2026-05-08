@@ -12,12 +12,18 @@
     "dev": "npx nodemon index.js"
   },
   "dependencies": {
+    "cloudinary": "^1.41.0",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
+    "ejs-mate": "^4.0.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "http": "^0.0.1-security",
     "mongoose": "^9.5.0",
+    "multer": "^2.1.1",
+    "multer-storage-cloudinary": "^4.0.0",
     "nodemon": "^3.1.14",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",

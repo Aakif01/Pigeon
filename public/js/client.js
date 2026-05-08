@@ -2,23 +2,10 @@ let ws;
 
 if (!window.ws) {
 
-  ws = new WebSocket("ws://localhost:3000");
+  const protocol =
+    window.location.protocol === "https:" ? "wss" : "ws";
 
-ws.addEventListener("open", () => {
-
-  console.log("WS opened");
-
-  setTimeout(() => {
-
-    ws.send(JSON.stringify({
-      type: "join"
-    }));
-
-    console.log("Join sent");
-
-  }, 100);
-
-});
+  ws = new WebSocket(`${protocol}://${window.location.host}`);
 
   window.ws = ws;
 

@@ -2,6 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
 }
 
 body{
@@ -88,8 +89,9 @@ a{
 
 .chat{
   display: flex;
-  height: 50px;
+  height: 55px;
   align-items: center;
+  margin-top: 10px;
 }
 
 .chat div{
@@ -152,6 +154,10 @@ a{
 
 .actions div:hover{
   background-color: #efefef;
+}
+
+.empty-img{
+  width: 100%;
 }
 
 /* ========================= */

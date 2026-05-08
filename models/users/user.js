@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
     type: String
   },
   profile: {
-    type: String
+   url: String,
+   filename: String
   },
   friends: [{
     user: {

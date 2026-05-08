@@ -1,12 +1,23 @@
-import ws from "./client.js"
+import ws from "./client.js";
 
 let actions = document.querySelector(".actions");
 let ellipsis = document.querySelector(".ellipsis");
 
-ellipsis.addEventListener("click", () => {
+ellipsis.addEventListener("click", (e) => {
+  e.stopPropagation();
+
   actions.classList.toggle("block");
-  ellipsis.classList.toggle("active")
-})
+  ellipsis.classList.toggle("active");
+});
+
+
+
+document.addEventListener("click", () => {
+
+  actions.classList.remove("block");
+
+});
+
 
 ws.addEventListener("message", (e) => {
 
@@ -16,7 +27,6 @@ ws.addEventListener("message", (e) => {
 
     let convoId = data.conversation;
 
-    console.log("New message for:", convoId);
 
     let friendItem =
       document.querySelector(
@@ -28,7 +38,6 @@ ws.addEventListener("message", (e) => {
 
     if (friendItem && friendsContainer) {
 
-      console.log("Moving chat to top");
 
       friendsContainer.prepend(
         friendItem.parentElement
@@ -40,7 +49,6 @@ ws.addEventListener("message", (e) => {
   
   if (data.type === "new-friend") {
 
-    alert("New friend arrived");
     
     let friendsContainer =
       document.querySelector("main");
@@ -66,7 +74,7 @@ ws.addEventListener("message", (e) => {
           <img src="/images/profile.png" />
         </div>
         <div class="user">
-          <p>+91${firstName}</p>
+          <p>${firstName}</p>
         </div>
       </div>
     `;
